@@ -1,0 +1,119 @@
+a$ = 0
+void foo_if(void) PROC                           ; foo_if
+$LN5:
+        ;Зарезервировать область стэка под локальные переменные
+        ;TODO - выяснить, зачем 24, когда хватило бы 4
+        sub     rsp, 24
+        ;Положить в стэк куда указывает rsp + 0 значение 1
+        ;int a = 1;
+        mov     DWORD PTR a$[rsp], 1
+        ;Сравнить double word в стэке со значением 1
+        ;if (a == 1)
+        cmp     DWORD PTR a$[rsp], 1
+        ;JumpNotEquivalent (не равно) на метку $LN2@foo_if (ветка else)
+        jne     SHORT $LN2@foo_if
+        ;Прочитать double word из стэка (rsp + 0) в регистр eax
+        mov     eax, DWORD PTR a$[rsp]
+        ;Добавить к eax 10
+        add     eax, 10
+        ;Записать результат обратно в стэк
+        mov     DWORD PTR a$[rsp], eax
+        ;Перейти (безусловный jump) на метку $LN3@foo_if
+        jmp     SHORT $LN3@foo_if
+$LN2@foo_if:
+        ;Ветка else
+        ;Прочитать из стэка, сдвинуть влево на 1 бит (умножить на 2), записать обратно в стэк
+        mov     eax, DWORD PTR a$[rsp]
+        shl     eax, 1
+        mov     DWORD PTR a$[rsp], eax
+$LN3@foo_if:
+        ;Восстановить стэк и завершить функцию
+        add     rsp, 24
+        ret     0
+void foo_if(void) ENDP                           ; foo_if
+
+a$ = 0
+tv64 = 4
+void foo_switch(void) PROC                       ; foo_switch
+$LN7:
+        ;Зарезервировать область стэка под локальные переменные
+        ;TODO - выяснить, зачем 24, когда хватило бы 8 (два double word)
+        sub     rsp, 24
+        ;Положить в стэк (rsp + 0) значение double word 0
+        mov     DWORD PTR a$[rsp], 0
+        ;Прочитать только что положенное значение в eax
+        mov     eax, DWORD PTR a$[rsp]
+        ;Поместить в область стэка (rsp + 4) значение из eax
+        mov     DWORD PTR tv64[rsp], eax
+        ;Сравнить значение по rsp + 4 с константой 0
+        cmp     DWORD PTR tv64[rsp], 0
+        ;JumpEquivalent если равно перейти на метку $LN4@foo_switch (Ветка сложения с 10)
+        je      SHORT $LN4@foo_switch
+        ;Сравнить значение по rsp + 4 с константой 1
+        cmp     DWORD PTR tv64[rsp], 1
+        ;JumpEquivalent если равно перейти на метку $LN5@foo_switch (Ветка умножения на 2)
+        je      SHORT $LN5@foo_switch
+        ;Безусловный переход на завершение
+        jmp     SHORT $LN2@foo_switch
+$LN4@foo_switch:
+        ;Блок сложения с 10 (прочитать (rsp + 0) в регистр, сложить, записать обратно)
+        mov     eax, DWORD PTR a$[rsp]
+        add     eax, 10
+        mov     DWORD PTR a$[rsp], eax
+        jmp     SHORT $LN2@foo_switch
+$LN5@foo_switch:
+        ;Блок умножения на два (прочитать (rsp + 0) в регистр, умножить, записать обратно)
+        mov     eax, DWORD PTR a$[rsp]
+        shl     eax, 1
+        mov     DWORD PTR a$[rsp], eax
+$LN2@foo_switch:
+        ;Восстановить стэк и завершить функцию 
+        add     rsp, 24
+        ret     0
+void foo_switch(void) ENDP                       ; foo_switch
+
+a$ = 0
+tv67 = 4
+void foo_ternary(void) PROC                                ; foo_ternary
+$LN5:
+        ;Зарезервировать область стэка под локальные переменные
+        ;TODO - выяснить, зачем 24, когда хватило бы 8 (два double word)
+        sub     rsp, 24
+        ;Положить в стэк (rsp + 0) значение double word 0
+        mov     DWORD PTR a$[rsp], 0
+        ;Сравнить значение по rsp + 0 с константой 1
+        cmp     DWORD PTR a$[rsp], 1
+        ;JumpNotEquivalent если не равно перейти на метку $LN3@foo_ternar (Ветка else умножение на 2)
+        jne     SHORT $LN3@foo_ternar
+        ;Прочитать rsp + 0 в регистр eax, добавить 10, записать в rsp + 4 !!! Вторая переменная
+        ;TODO - прояснить, почему не сразу в rsp + 0, а использовать вторую переменную
+        mov     eax, DWORD PTR a$[rsp]
+        add     eax, 10
+        mov     DWORD PTR tv67[rsp], eax
+        ;Переход на заключительную часть
+        jmp     SHORT $LN4@foo_ternar
+$LN3@foo_ternar:
+        ;Ветка else
+        ;Прочитать, умножить на 2, положить во вторую переменную
+        mov     eax, DWORD PTR a$[rsp]
+        shl     eax, 1
+        mov     DWORD PTR tv67[rsp], eax
+$LN4@foo_ternar:
+        ;Переложить из второй переменной (rsp + 4) в первую (rsp + 0)
+        mov     eax, DWORD PTR tv67[rsp]
+        mov     DWORD PTR a$[rsp], eax
+        ;Восстановить стэк и завершить
+        add     rsp, 24
+        ret     0
+void foo_ternary(void) ENDP                                ; foo_ternary
+
+--------------------------------------------------- ВЫВОД ---------------------------------------------------
+1. Оператор if/else делает одно сравнение, работает с одной переменной, сразу кладет результат
+2. Оператор switch/case делает два сравнения (!!! но так указано в коде на С++, есть второй case и нет default),
+перенную для сравнения хранит в rsp + 4, результат в rsp + 0
+3. Оператор тернарный делает одно сравнение, результат кладет во вторую переменную rsp + 4, перед выходом перекладывает в 
+первую переменную rsp + 0
+
+---------------------------------------------------ГЛАВНЫЙ ВЫВОД ---------------------------------------------------
+Использовать оператор if/else :)
+PS В данной работе не проверили оператор switch c одним case и default (может сработать как if/else)
