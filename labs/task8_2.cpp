@@ -60,7 +60,7 @@ bool reverseAlphabeticalOrder(const std::wstring& a, const std::wstring& b) {
 int main() {
     setlocale(LC_ALL, "en_US.UTF-8");
     const int MAX_WORDS = 1000;
-    std::wcin.imbue(std::locale(std::locale(), new std::codecvt_utf8<wchar_t>));
+    //std::wcin.imbue(std::locale(std::locale(), new std::codecvt_utf8<wchar_t>));
     std::wcout.imbue(std::locale(std::locale(), new std::codecvt_utf8<wchar_t>));
 
     std::wstring line = L"1на 2наа 3нааа 4наааа";
