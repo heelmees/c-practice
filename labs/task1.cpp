@@ -37,4 +37,13 @@ int main()
     double v_double = 10.45;
     std::cout << "double значение: " << v_double << " размер: " << sizeof(v_double) << " байта, max " << pow(2, sizeof(v_double * 8) - 1) << std::endl;
 
+
+    //Задание 3
+    v_uint = pow(2, sizeof(v_uint) * 8) - 1;
+    unsigned int v_uint_overflow = v_uint + 1;
+    std::cout << "max unsigned int: " << v_uint << ", переполнение: " << v_uint_overflow << std::endl;
+    // max unsigned int: 4294967295, переполнение: 0
+    // При переполнении максимального значения числа на 1 (характерный пример), все биты числа обнуляются, 
+    // а единица "уходит" в разряд, находящийся за пределами (левее) ячейки памяти, выделенной под число
+    
 }
