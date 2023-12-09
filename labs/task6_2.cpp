@@ -8,12 +8,12 @@ int main() {
     int sum = 0;
     while (N > 0) {
         int digit = N % 10;
-        if (digit % 2 == 1) { 
+        if (digit % 2 == 0) { 
             sum += digit;
         }
         N /= 10;
     }
 
-    std::cout << "Сумма нечетных цифр числа: " << sum << std::endl;
+    std::cout << "Сумма четных цифр числа: " << sum << std::endl;
     return 0;
 }
