@@ -26,7 +26,7 @@ bool isValidWord(const std::wstring& word, const std::unordered_map<wchar_t, int
 }
 
 bool compareByLength(const std::wstring& a, const std::wstring& b) {
-    return a.size() < b.size();
+    return a.size() > b.size();
 }
 
 int main() {
@@ -34,6 +34,14 @@ int main() {
     std::wifstream inFile("input_task8_1.txt");
     std::wofstream outFile("output_task8_1.txt");
     std::wstring baseWord = L"язык"; // Замените на ваше заданное слово
+    int N;
+
+    std::cout << "Введите максимальное число слов (не более " << MAX_WORDS << "): "; // Кол-во самых длинных слов
+    std::cin >> N;
+    if (N > MAX_WORDS) {
+        std::cout << "Число слов не должно быть больше " << MAX_WORDS << std::endl;
+        return 1; 
+    }
     
     // Cоставить map c кол-вом встречающихся букв
     // Можно было обойтись простым массивом, но было интересно поковырять)
@@ -71,6 +79,9 @@ int main() {
 
     std::sort(words, words + wordCount, compareByLength);
 
+    if (wordCount > N) {
+        wordCount = N;
+    }
     for (int i = 0; i < wordCount; ++i) {
         outFile << words[i] << std::endl;
     }
