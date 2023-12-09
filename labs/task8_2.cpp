@@ -6,9 +6,24 @@
 #include <cwctype>
 #include <sstream>
 
+void printStrSequence(std::wstring sequence[], int n) {
+    for (int i = 0; i < n; i++) {
+        std::wcout << sequence[i] << " ";
+    }
+    // std::cout << std::endl;
+}
+
 bool isVowel(const wchar_t ch) {
     std::wstring vowels = L"аеёиоуыэюяАЕЁИОУЫЭЮЯ";
     if (vowels.find(ch) != std::wstring::npos) {
+        return true;
+    }
+    return false;
+}
+
+bool isConsonant(const wchar_t ch) {
+    std::wstring consonants = L"бвгджзйклмнпрстфхцчшщБВГДЖЗЙКЛМНПРСТФХЦЧШЩ";
+    if (consonants.find(ch) != std::wstring::npos) {
         return true;
     }
     return false;
@@ -26,15 +41,24 @@ int countVowels(const std::wstring& word) {
 }
 
 // Функция для обработки слова
-std::wstring processWord(const std::wstring& word) {
+std::wstring processWord(const std::wstring& word, bool& needToSort) {
     if (countVowels(word) >= 3) {
+        needToSort = true;
         return word; // Возвращаем слово без изменений
     } else {
+        needToSort = false;
         std::wstring result;
         for (wchar_t ch : word) {
-            if (!isVowel(ch)) {
+            if (isConsonant(ch)) {
                 result.push_back(ch);
                 result.push_back(ch);   
+            } else {
+                if (isVowel(ch)) {
+                    // Не брать
+                } else {
+                    // Брать 1 раз
+                    result.push_back(ch);
+                }
             }
         }
         return result;
@@ -65,19 +89,27 @@ int main() {
 
     std::wstring line = L"1на 2наа 3нааа 4наааа";
     std::wstring words[MAX_WORDS];
-    std::wstring results[MAX_WORDS];
+    std::wstring resultsSorted[MAX_WORDS];
+    std::wstring resultsUnSorted[MAX_WORDS];
+    int indexSorted = 0;
+    int indexUnSorted = 0;
+
     int wordCount = splitToWords(line, words, MAX_WORDS);
     for (int i = 0; i < wordCount; ++i) {
-        std::wstring result = processWord(words[i]);
-        results[i] = result;
+        bool needToSort;
+        std::wstring result = processWord(words[i], needToSort);
+        if (needToSort) {
+            resultsSorted[indexSorted++] = result;
+        } else {
+            resultsUnSorted[indexUnSorted++] = result;
+        }
     }
 
-    std::sort(results, results + wordCount, reverseAlphabeticalOrder);
+    std::sort(resultsSorted, resultsSorted + indexSorted + 1, reverseAlphabeticalOrder);
 
-    // Выводим результат, в нашем примере будет 4наааа 3нааа 22нн 11нн (1 и 2 не гласные :)  )
-    for (const auto& w : results) {
-        std::wcout << w << L' ';
-    }
+    // Выводим результат 
+    printStrSequence(resultsSorted, indexSorted + 1);
+    printStrSequence(resultsUnSorted, indexUnSorted + 1);
 
     return 0;
 }
