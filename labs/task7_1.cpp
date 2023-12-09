@@ -1,9 +1,11 @@
 #include <iostream>
-#include <algorithm> // Для std::sort
+// Нет необходимости, будем использовать собственную сортировку
+//#include <algorithm> // Для std::sort
+#include "common.hpp"
 
 
 int main() {
-    unsigned A[] = {30, 1, 100, 5, 10, 20, 30, 25, 77};
+    int A[] = {30, 1, 100, 5, 10, 20, 30, 25, 77, 24};
     int array_size = sizeof(A) / sizeof(A[0]);
     bool shouldSort = false;
     unsigned N;
@@ -25,7 +27,9 @@ int main() {
     }
 
     if (shouldSort) {
-        std::sort(A, A + array_size);
+        // std::sort(A, A + array_size);
+        // Вместо std::sort используем собственнуюу сортировку из namespace common
+        common::sortInt(A, 0, array_size - 1);
     }
 
     std::cout << "Результат:" << std::endl;
