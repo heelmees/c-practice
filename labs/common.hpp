@@ -2,6 +2,7 @@
 #define COMMON_HPP
 
 #include <iostream>
+#include <vector>
 
 
 namespace common {
@@ -9,7 +10,25 @@ namespace common {
 void sortInt(int arr[], int low, int high);
 int partition(int arr[], int low, int high);
 void swap(int* a, int* b);
+int sumOfDigits(int number);
+void printIntVector(std::vector<int> v);
 
+// Функция для подсчета суммы цифр числа
+int sumOfDigits(int number) {
+    int sum = 0;
+    while (number > 0) {
+        sum += number % 10;
+        number /= 10;
+    }
+    return sum;
+}
+
+void printIntVector(std::vector<int> v) {
+   for (int elem: v) {
+      std::cout << elem << " ";
+   }
+   std::cout << std::endl;
+}
 
 // Функция быстрой сортировки
 void sortInt(int arr[], int low, int high) {
