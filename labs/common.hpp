@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+typedef std::vector<int> Vector;
+typedef std::vector<std::vector<int>> Matrix;
 
 namespace common {
 
@@ -23,11 +25,21 @@ int sumOfDigits(int number) {
     return sum;
 }
 
-void printIntVector(std::vector<int> v) {
+void printIntVector(Vector v) {
    for (int elem: v) {
       std::cout << elem << " ";
    }
    std::cout << std::endl;
+}
+
+void printIntMatrix(Matrix matrix) {
+    for (int i = 0; i < matrix.size(); i++) {
+        for (int j = 0; j < matrix[i].size(); j++) {
+            std::cout << matrix[i][j] << "\t";
+        }
+        std::cout << "\n";
+    }
+    std::cout << std::endl;
 }
 
 // Функция быстрой сортировки
