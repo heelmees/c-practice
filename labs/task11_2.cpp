@@ -1,56 +1,80 @@
 #include <iostream>
-#include <vector>
+#include <climits> // Для использования INT_MAX
 #include "common.hpp"
 
-
-int columnForMinElem(Matrix matrix) {
-    int minElement = matrix[0][0];
-    int minCol = 0;
-    for (int i = 0; i < matrix.size(); i++) {
-        for (int j = 0; j < matrix[i].size(); j++) {
-            if (matrix[i][j] < minElement) {
-                minElement = matrix[i][j];
-                minCol = j;
-            }
+void printIntMatrix(int** matrix, int n, int m) {
+    /*
+    // Обычный вариант
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            std::cout << matrix[i][j] << "\t";
         }
+        std::cout << std::endl;
     }
-    return minCol;
-}
-
-// Попробовать передавать матрицу не по ссылке (&), а по указателю
-void set0ToNegativeElemInColumn(Matrix *pMatrix, int minCol) {
-    for (int i = 0; i < (*pMatrix).size(); i++) {
-        if ((*pMatrix)[i][minCol] < 0) {
-            (*pMatrix)[i][minCol] = 0;
+    */
+    // Вариант с арифметикой указателей
+     for (int** rowPtr = matrix; rowPtr < matrix + n; ++rowPtr) {
+        int* row = *rowPtr;
+        for (int* elemPtr = row; elemPtr < row + m; ++elemPtr) {
+            std::cout << *elemPtr << "\t";
         }
+        std::cout << std::endl;
     }
-
+    std::cout << std::endl;
 }
 
 int main() {
-    Matrix matrix = {
-        {1, -2, 3, 4},
-        {-5, 6, -7, 8},
-        {9, 10, -11, -12},
-        {13, -14, 15, 16},
-        {-17, 18, -19, 20}
-    };
+    int n, m;
+    std::cout << "Введите количество строк (n): ";
+    std::cin >> n;
+    std::cout << "Введите количество столбцов (m): ";
+    std::cin >> m;
 
-    int minCol = columnForMinElem(matrix);
+    if (n <= 0 || n > 100 || m <= 0 || m > 100) {
+        std::cerr << "n и m должны быть в пределах от 1 до 100." << std::endl;
+        return 1;
+    }
 
-    set0ToNegativeElemInColumn(&matrix, minCol);
+    // Выделение памяти под матрицу
+    int** matrix = new int*[n];
+    for (int i = 0; i < n; ++i) {
+        matrix[i] = new int[m];
+    }
 
-    std::cout << "Результат: " << std::endl;
-    common::printIntMatrix(matrix);
+    // Заполнение матрицы и сразу поиск наименьшего элемента и его столбца
+    int minElement = INT_MAX;
+    int minColumn = 0;
+    std::cout << "Введите элементы матрицы:" << std::endl;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            std::cin >> matrix[i][j];
+            if (matrix[i][j] < minElement) {
+                minElement = matrix[i][j];
+                minColumn = j;
+            }
+        }
+    }
 
-    // Очистка матрицы
-    // Этого делать не нужно, т.к. при выходе из области видимости (main) память освободится автоматически
-    /*
-    matrix.clear();
-    std::cout << "Размер: " << matrix.size() << " Ёмкость: " << matrix.capacity() << std::endl;
-    matrix.shrink_to_fit();
-    std::cout << "Размер: " << matrix.size() << " Ёмкость: " << matrix.capacity() << std::endl;
-    */
+    // Вывод оригинальной матрицы
+    std::cout << "Оригинальная матрица:" << std::endl;
+    printIntMatrix(matrix, n, m);
+
+    // Замена отрицательных элементов в столбце с наименьшим элементом на 0
+    for (int i = 0; i < n; ++i) {
+        if (matrix[i][minColumn] < 0) {
+            matrix[i][minColumn] = 0;
+        }
+    }
+
+    // Вывод измененной матрицы
+    std::cout << "Измененная матрица:" << std::endl;
+    printIntMatrix(matrix, n, m);
+
+    // Освобождение памяти
+    for (int i = 0; i < n; ++i) {
+        delete[] matrix[i];
+    }
+    delete[] matrix;
 
     return 0;
 }
