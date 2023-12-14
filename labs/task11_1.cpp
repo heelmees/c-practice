@@ -1,28 +1,46 @@
-#include <vector>
 #include <iostream>
 #include <algorithm>
-#include "common.hpp"
 
-bool shouldSort(std::vector<int> array) {
-    int sum_digits;
-    for (int i = 0; i < array.size(); i++) {
-        sum_digits = common::sumOfDigits(array[i]);
-        if (sum_digits == 14) {
-            return true;
-        }
+// Функция для вычисления суммы цифр числа
+int sumOfDigits(int number) {
+    int sum = 0;
+    while (number > 0) {
+        sum += number % 10;
+        number /= 10;
     }
-    return false;
+    return sum;
 }
 
 int main() {
-    std::vector<int> array = {30, 1, 100, 5, 10, 20, 30, 25, 77, 24};
+    int n;
 
-    if (shouldSort(array)) {
-        std::sort(array.begin(), array.end());
+    std::cout << "Введите количество элементов последовательности: " << std::endl;
+    std::cin >> n;
+    int* sequence = new int[n];
+    std::cout << "Введите " << n << " элеметнов последовательности: " << std::endl;
+    for (int i = 0; i < n; ++i) {
+        std::cin >> *(sequence + i);
     }
 
-    std::cout << "Результат:" << std::endl;
-    common::printIntVector(array);
+    bool shouldSort = false;
+    for (int* ptr = sequence; ptr < sequence + n; ++ptr) {
+        if (sumOfDigits(*ptr) == 14) {
+            shouldSort = true;
+            break;
+        }
+    }
+
+    if (shouldSort) {
+        std::sort(sequence, sequence + n);
+    }
+
+    for (const int* ptr = sequence; ptr < sequence + n; ++ptr) {
+        std::cout << *ptr << " ";
+    }
+    std::cout << std::endl;
+
+    // Освободить память
+    delete[] sequence;
 
     return 0;
 }
